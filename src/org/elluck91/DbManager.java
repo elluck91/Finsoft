@@ -1,6 +1,7 @@
 package org.elluck91;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.*;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -68,7 +71,8 @@ public class DbManager implements IRepo{
     
     @Override
 	public Employee getEmployeeDetails(String employee_id) {
-		try {
+		Employee employee = null;
+    	try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con  = DriverManager.getConnection("jdbc:mysql://localhost:3306/employees","root","blank");
 			String statement = "SELECT employees.emp_no, employees.birth_date, employees.first_name, employees.last_name, employees.hire_date, dept_emp.dept_no, salaries.salary, titles.title, departments.dept_name\r\n" + 
@@ -84,18 +88,18 @@ public class DbManager implements IRepo{
 			sql.setString(1, employee_id);
 
 			ResultSet res = sql.executeQuery();
-			ResultSetMetaData rsmd = res.getMetaData();
-			int columnsNumber = rsmd.getColumnCount();
 			while (res.next()) {
-			    for (int i = 1; i <= columnsNumber; i++) {
-			        if (i > 1) System.out.print(",  ");
-			        String columnValue = res.getString(i);
-			        System.out.print(columnValue + " " + rsmd.getColumnName(i));
-			    }
-			    System.out.println("");
+			    employee = new Employee(res.getInt("emp_no"),
+			    		res.getDate("birth_date"),
+			    		res.getString("first_name"),
+			    		res.getString("last_name"),
+			    		res.getDate("hire_date"),
+			    		res.getString("dept_name"),
+			    		res.getDouble("salary"),
+			    		res.getString("title"));
 			}
 
-
+			
 		} catch (SQLException ex) {
 			Logger.getLogger(DbManager.class.getName()).log(Level.SEVERE, "ex happened !!!", ex);
 			return null;
@@ -112,29 +116,80 @@ public class DbManager implements IRepo{
 				Logger.getLogger(DbManager.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
-		return null;
+		return employee;
 	}
     
-	public void updateEmployee() {
+	public void updateEmployee(Employee employee) {
 		
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			con  = DriverManager.getConnection("jdbc:mysql://localhost/employees","root","admin");
-			PreparedStatement sql = con.prepareStatement("SELECT transactions FROM users where username=?");
+			con  = DriverManager.getConnection("jdbc:mysql://localhost/employees","root","blank");
+			
+			// update employees table
+			String statementEmployee = "UPDATE employees SET \r\n" + 
+					"birth_date=?\r\n" + 
+					"first_name=?\r\n" + 
+					"last_name=?\r\n" + 
+					"hire_date=? WHERE emp_no=?";
+			
+			// update dept_emp table
+			String getDeptId = "SELECT dept_no FROM departments WHERE dept_name=?";
+			PreparedStatement sql = con.prepareStatement(getDeptId);
+			sql.setString(1, employee.getDepartment());
 
-			//sql.setString(1, username);
-			String transactionList = "";
 			ResultSet res = sql.executeQuery();
-			
+			String deptId = null;
 			while (res.next()) {
-			    transactionList += res.getString("transactions");
-				
+			    deptId = res.getString("dept_no");
 			}
-			//transactionList += transaction_id + ",";
-			sql = con.prepareStatement("UPDATE users SET transactions=? WHERE username=?");
-			sql.setString(1, transactionList);
-			//sql.setString(2, username);
 			
+			String dept_emp = "UPDATE dept_emp SET dept_no=? WHERE emp_no=?";
+			
+			sql = con.prepareStatement(dept_emp);
+			sql.setString(1, deptId);
+			sql.setInt(2, employee.getEmployee_number());
+			
+			sql.execute();
+			
+			// close last salary
+			String closeSalary = "UPDATE salaries set to_date=NOW() WHERE emp_no=? AND salary=?";
+			sql = con.prepareStatement(closeSalary);
+			sql.setInt(1, employee.getEmployee_number());
+			sql.setDouble(2, employee.getLatest_salary());
+			sql.execute();
+			
+			// create new salary
+			String newSalary = "INSERT INTO salaries VALUES(?,?,NOW(),?)";
+			sql = con.prepareStatement(newSalary);
+			sql.setInt(1, employee.getEmployee_number());
+			sql.setDouble(2, employee.getLatest_salary());
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date tempDate = null;
+			try {
+				tempDate = format.parse("9999-01-01");
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			Date to_Date = new java.sql.Date(tempDate.getTime());
+			sql.setDate(3, to_Date);
+
+			sql.execute();
+			
+			// close last position
+			String closePosition = "UPDATE titles set to_date=NOW() WHERE emp_no=? AND to_date=?";
+			sql = con.prepareStatement(closePosition);
+			sql.setInt(1, employee.getEmployee_number());
+			sql.setDate(2, to_Date);
+			sql.execute();
+			
+			// create new positions
+			// BUT ONLY IF IT CHANGES
+			String newPosition = "INSERT INTO titles VALUES(?,?,NOW(),?)";
+			sql = con.prepareStatement(newPosition);
+			sql.setInt(1, employee.getEmployee_number());
+			sql.setString(2, employee.getTitle());
+			sql.setDate(3, to_Date);
 			sql.execute();
 			
 			con.close();

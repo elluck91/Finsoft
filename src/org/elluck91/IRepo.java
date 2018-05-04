@@ -16,7 +16,7 @@ public interface IRepo {
     
      int Login(String username,String password);
      void Logout();
-     void updateEmployee();
+     void updateEmployee(Employee employee);
      ArrayList<Employee> getAllEmployees();
      ArrayList<Employee> getDepartmentEmployees();
      Employee getMyDetails();

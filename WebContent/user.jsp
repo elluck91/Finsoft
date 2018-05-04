@@ -1,4 +1,7 @@
 <!doctype html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import = "java.io.*,java.util.*, org.elluck91.Employee" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html lang="en">
 
 <head>
@@ -120,18 +123,28 @@
                                     <p class="category">Complete your profile</p>
                                 </div>
                                 <div class="card-content">
-                                    <form>
+                                    <form action="EmployeeAPI" method="POST">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Department</label>
-                                                    <input type="text" class="form-control">
+                                                    <select class="form-control" id="department" name="department">
+                                                        <option>Customer Service</option>
+                                                        <option>Development</option>
+                                                        <option>Finance</option>
+                                                        <option>Human Resources</option>
+                                                        <option>Marketing</option>
+                                                        <option>Production</option>
+                                                        <option>Quality Management</option>
+                                                        <option>Research</option>
+                                                        <option>Sales</option>
+                                                        <option selected="selected"><c:out value="${employee.getDepartment()}" /></select></option>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Employee #</label>
-                                                    <input type="text" class="form-control">
+                                                    <input type="text" class="form-control" name="employee_number" value="<c:out value="${employee.getEmployee_number()}" />" readonly="readonly">
                                                 </div>
                                             </div>
                                         </div>
@@ -139,13 +152,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Title</label>
-                                                    <input type="email" class="form-control">
+                                                    <input type="text" class="form-control" name="title" value="<c:out value="${employee.getTitle()}" />">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Salary</label>
-                                                    <input type="email" class="form-control">
+                                                    <input type="text" class="form-control" name="latest_salary" value="<c:out value="${employee.getLatest_salary()}" />">
                                                 </div>
                                             </div>
                                         </div>
@@ -153,13 +166,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Fist Name</label>
-                                                    <input type="text" class="form-control">
+                                                    <input type="text" class="form-control" name="first_name" value="<c:out value="${employee.getFirst_name()}" />">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Last Name</label>
-                                                    <input type="text" class="form-control">
+                                                    <input type="text" class="form-control" name="last_name" value="<c:out value="${employee.getLast_name()}" />">
                                                 </div>
                                             </div>
                                         </div>
@@ -167,13 +180,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Birth Date</label>
-                                                    <input type="text" class="form-control">
+                                                    <input type="text" class="form-control" name="birth_date" value="<c:out value="${employee.getBirth_date()}" />">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Hire Date</label>
-                                                    <input type="text" class="form-control">
+                                                    <input type="text" class="form-control" name="hire_date" value="<c:out value="${employee.getHire_date()}" />">
                                                 </div>
                                             </div>
                                         </div>

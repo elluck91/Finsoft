@@ -7,12 +7,20 @@ public class Employee {
 	private Date birth_date;
 	private String first_name;
 	private String last_name;
-	private char gender;
 	private Date hire_date;
 	private String department;
+	private String dept_no;
 	private double latest_salary;
 	private String title;
 	
+	public String getDept_no() {
+		return dept_no;
+	}
+
+	public void setDept_no(String dept_no) {
+		this.dept_no = dept_no;
+	}
+
 	public int getEmployee_number() {
 		return employee_number;
 	}
@@ -43,14 +51,6 @@ public class Employee {
 
 	public void setLast_name(String last_name) {
 		this.last_name = last_name;
-	}
-
-	public char getGender() {
-		return gender;
-	}
-
-	public void setGender(char gender) {
-		this.gender = gender;
 	}
 
 	public Date getHire_date() {
@@ -85,14 +85,13 @@ public class Employee {
 		this.title = title;
 	}
 
-	public Employee(int employee_number, Date birth_date, String first_name, String last_name, char gender,
+	public Employee(int employee_number, Date birth_date, String first_name, String last_name,
 			Date hire_date, String department, double latest_salary, String title) {
 		super();
 		this.employee_number = employee_number;
 		this.birth_date = birth_date;
 		this.first_name = first_name;
 		this.last_name = last_name;
-		this.gender = gender;
 		this.hire_date = hire_date;
 		this.department = department;
 		this.latest_salary = latest_salary;
